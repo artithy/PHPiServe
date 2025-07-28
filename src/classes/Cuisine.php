@@ -29,25 +29,28 @@ class Cuisine extends Database
 
     public function create($name)
     {
-        $stmt = $this->pdo->prepare("INSERT INTO cuisine (name) VALUES (:name)");
-        return $stmt->execute(['name' => $name]);
+        return $this->pdo->exec("INSERT INTO cuisine (name) VALUES ('$name')");
     }
 
     public function getAll()
     {
-        $stmt = $this->pdo->query("SELECT * FROM cuisine ORDER BY id DESC");
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $this->pdo->query("SELECT * FROM cuisine ORDER BY id DESC")
+            ->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function update($id, $name)
     {
-        $stmt = $this->pdo->prepare("UPDATE cuisine SET name= :name WHERE id= :id");
-        return $stmt->execute(['id' => $id, 'name' => $name]);
+        return $this->pdo->exec("UPDATE cuisine SET name = '$name' WHERE id = $id");
     }
 
     public function delete($id)
     {
-        $stmt = $this->pdo->prepare("DELETE from cuisine WHERE id= :id");
-        return $stmt->execute(['id' => $id]);
+        return $this->pdo->exec("DELETE FROM cuisine WHERE id = $id");
+    }
+
+    public function getCuisineNameById($id)
+    {
+        return $this->pdo->query("SELECT name FROM cuisine WHERE id=$id")
+            ->fetch(PDO::FETCH_ASSOC);
     }
 }
