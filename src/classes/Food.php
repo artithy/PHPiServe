@@ -7,7 +7,7 @@ use PDO;
 
 class Food extends Database
 {
-    private $pdo;
+    public $pdo;
 
     public function __construct()
     {

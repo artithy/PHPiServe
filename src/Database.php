@@ -12,7 +12,7 @@ class Database
     private $username = "signup_login";
     private $password = "123456";
 
-    private $pdo;
+    public $pdo;
 
     public function connect()
     {
