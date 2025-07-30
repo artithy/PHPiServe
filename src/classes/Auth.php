@@ -51,7 +51,7 @@ class Auth extends Authbase
 
         $token = new Token();
         $token->createTable();
-        $token->createTable([
+        $token->create([
             'token' => $tokenValue,
             'user_id' => $user_id
         ]);
@@ -86,16 +86,53 @@ class Auth extends Authbase
 
         $tokenValue = $this->generateToken();
         $token = new Token();
-        $token->createTable([
+        $token->create([
             'token' => $tokenValue,
             'user_id' => $user['id']
         ]);
+
 
         return [
             'status' => true,
             'message' => 'Login successful',
             'user_id' => $user['id'],
             'token' => $tokenValue
+
+        ];
+    }
+
+    public function dashboard($token)
+    {
+
+
+        $stmt = $this->pdo->prepare("SELECT * FROM token WHERE token = '$token'");
+        $stmt->execute();
+
+        $tokenData = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$tokenData) {
+            http_response_Code(400);
+            return [
+                'status' => false,
+                'message' => 'Invalid or expired token'
+            ];
+        }
+
+        $userId = $tokenData['user_id'];
+        $userStmt = $this->pdo->prepare("SELECT id , user_name , email FROM user WHERE id = '$userId' ");
+        $userStmt->execute();
+        $user = $userStmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$user) {
+            return [
+                'status' => false,
+                'message' => 'User not found'
+            ];
+        }
+
+        return [
+            'status' => true,
+            'message' => 'Welcome to dashboard',
+            'user' => $user
 
         ];
     }
