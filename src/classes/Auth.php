@@ -47,7 +47,7 @@ class Auth extends Authbase
 
         $user_id = $this->pdo->lastInsertId();
 
-        $tokenValue = bin2hex(random_bytes(32));
+        $tokenValue = $this->generateToken();
 
         $token = new Token();
         $token->createTable();
@@ -61,6 +61,42 @@ class Auth extends Authbase
             'message' => 'Signup successful',
             'user_id' => $user_id,
             'token' => $tokenValue
+        ];
+    }
+
+    public function login($email, $password)
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM user WHERE email = '$email'");
+        $stmt->execute();
+
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$user) {
+            return [
+                'status' => false,
+                'message' => 'User not found'
+            ];
+        }
+        if (!$this->verifyPassword($password, $user['password'])) {
+            return [
+                'status' => false,
+                'message' => 'Incorrect password'
+            ];
+        }
+
+        $tokenValue = $this->generateToken();
+        $token = new Token();
+        $token->createTable([
+            'token' => $tokenValue,
+            'user_id' => $user['id']
+        ]);
+
+        return [
+            'status' => true,
+            'message' => 'Login successful',
+            'user_id' => $user['id'],
+            'token' => $tokenValue
+
         ];
     }
 }
