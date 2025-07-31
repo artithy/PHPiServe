@@ -4,12 +4,14 @@
 namespace App\classes;
 
 use App\Database;
+use App\traits\AuthUtils;
 use PDO;
 
 
 class Cuisine extends Database
 {
-    private $pdo;
+    use AuthUtils;
+    public $pdo;
 
     public function __construct()
     {

@@ -3,10 +3,20 @@
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use App\classes\Cuisine;
+use App\traits\AuthUtils;
 
 header('Content-Type: application/json');
 
 $cuisine = new Cuisine();
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    $cuisine->printResponse([
+        'status' => false,
+        'message' => 'Only POST method is allowed'
+    ]);
+    exit;
+}
 
 $input = json_decode(file_get_contents('php://input'), true);
 $name = $input['name'] ?? null;

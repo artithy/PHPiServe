@@ -4,7 +4,15 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 use App\classes\Food;
 
-header('Content-Type: application/json');
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    $cuisine->printResponse([
+        'status' => false,
+        'message' => 'Only POST method is allowed'
+    ]);
+    exit;
+}
 
 $input = json_decode(file_get_contents('php://input'), true);
 

@@ -62,4 +62,9 @@ class Token extends Database
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         return $row['user_id'] ?? false;
     }
+
+    public function generateGuestCartToken()
+    {
+        return uniqid('guestcart_', true);
+    }
 }

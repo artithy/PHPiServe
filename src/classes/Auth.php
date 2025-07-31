@@ -136,4 +136,24 @@ class Auth extends Authbase
 
         ];
     }
+
+    public function logout($token)
+    {
+        $tokenObj = new Token();
+        $valid = $tokenObj->validate($token);
+
+        if (!$valid) {
+            return [
+                'status' => false,
+                'message' => 'Invalid token'
+            ];
+        }
+
+        $tokenObj->deactivate($token);
+
+        return [
+            'status' => true,
+            'message' => 'Logout successful'
+        ];
+    }
 }
