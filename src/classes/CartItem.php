@@ -39,22 +39,22 @@ class CartItem extends Database
         return $stmt->execute();
     }
 
-    public function updateItem($cart_id, $food_id, $additionalQty, $price)
+    public function updateItem($cart_id, $food_id, $newQuantity)
     {
-        $sql = "SELECT * FROM cart_items WHERE cart_id = '$cart_id ' AND food_id = '$food_id' LIMIT 1";
+        $sql = "SELECT * FROM cart_items WHERE cart_id = '$cart_id' AND food_id = '$food_id' LIMIT 1";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute();
         $item = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($item) {
-            $newQty = $item['quantity'] + $additionalQty;
-            $updateSql = "UPDATE cart_items SET quantity= '$newQty' , price = '$price' WHERE  id = '{item['id']}'";
+            $updateSql = "UPDATE cart_items SET quantity = '$newQuantity' WHERE id = '{$item['id']}'";
             $updateStmt = $this->pdo->prepare($updateSql);
             return $updateStmt->execute();
         }
 
         return false;
     }
+
 
     public function getItemWithFood($cart_id)
     {
