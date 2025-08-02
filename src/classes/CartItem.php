@@ -77,4 +77,12 @@ class CartItem extends Database
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+
+    public function delete($cart_id, $food_id)
+    {
+        $sql = "DELETE FROM cart_items WHERE cart_id = $cart_id AND food_id = $food_id";
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute();
+    }
 }
