@@ -7,13 +7,13 @@ use App\classes\Order;
 use App\classes\OrderItem;
 use App\traits\AuthUtils;
 
-$auth = new class {
-    use AuthUtils;
-};
-
+// $auth = new class {
+//     use AuthUtils;
+// };
+$order = new Order();
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
-    $auth->printResponse([
+    $order->printResponse([
         'status' => false,
         'message' => 'Only POST method allowed'
     ]);
@@ -27,7 +27,7 @@ if (
     empty($input['items'])
 ) {
     http_response_code(400);
-    $auth->printResponse([
+    $order->printResponse([
         'status' => false,
         'message' => 'Required fields are missing or items are empty'
     ]);
@@ -39,7 +39,7 @@ $cartData = $cart->getCartByToken($input['cart_token']);
 
 if (!$cartData) {
     http_response_code(404);
-    $auth->printResponse([
+    $order->printResponse([
         'status' => false,
         'message' => 'Cart not found'
     ]);
@@ -64,10 +64,10 @@ $order_id = $order->createOrder(
 
 $orderItem->addItems($order_id, $input['items']);
 
-$order->updateStatus($order_id, 'ordered');
+// $order->updateStatus($order_id, 'ordered');
 
 http_response_code(201);
-$auth->printResponse([
+$order->printResponse([
     'status' => true,
     'message' => 'Order placed successfully',
     'order_id' => $order_id

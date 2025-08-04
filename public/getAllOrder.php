@@ -4,23 +4,19 @@ require_once __DIR__ . '/../vendor/autoload.php';
 use App\classes\Order;
 use App\traits\AuthUtils;
 
-$auth = new class {
-    use AuthUtils;
-};
+$order = new Order();
+$orders = $order->getAll();
 
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     http_response_code(405);
-    $auth->printResponse([
+    $order->printResponse([
         'status' => false,
         'message' => 'Only GET allowed'
     ]);
     exit;
 }
 
-$order = new Order();
-$orders = $order->getAll();
-
-$auth->printResponse([
+$order->printResponse([
     'status' => true,
     'orders' => $orders
 ]);

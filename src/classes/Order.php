@@ -3,11 +3,13 @@
 namespace App\classes;
 
 use App\Database;
+use App\traits\AuthUtils;
 use PDO;
 
 class Order extends Database
 {
     public $pdo;
+    use AuthUtils;
 
     public function __construct()
     {
@@ -57,6 +59,7 @@ class Order extends Database
         '{$total_price}',
         '{$order_id}',
         '{$invoice_id}',
+        'pending'
     )";
 
         $this->pdo->exec($sql);
@@ -100,14 +103,21 @@ class Order extends Database
     }
     public function updateStatus($id, $status)
     {
+        $valid_statuses = ['pending', 'ordered', 'shipped', 'delivered', 'cancelled', 'returned'];
+
+        if (!in_array($status, $valid_statuses)) {
+            throw new \Exception("Invalid status: $status");
+        }
+
         $sql = "UPDATE orders SET status = '{$status}' WHERE id = $id";
         return $this->pdo->exec($sql);
     }
 
 
-    public function delete($id)
-    {
-        $sql = "DELETE FROM orders WHERE id = $id";
-        return $this->pdo->exec($sql);
-    }
+
+    // public function delete($id)
+    // {
+    //     $sql = "DELETE FROM orders WHERE id = $id";
+    //     return $this->pdo->exec($sql);
+    // }
 }

@@ -3,9 +3,6 @@
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use App\classes\Cuisine;
-use App\traits\AuthUtils;
-
-header('Content-Type: application/json');
 
 $cuisine = new Cuisine();
 

@@ -4,13 +4,11 @@ require_once __DIR__ . '/../vendor/autoload.php';
 use App\classes\Order;
 use App\traits\AuthUtils;
 
-$auth = new class {
-    use AuthUtils;
-};
+$order = new Order();
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
-    $auth->printResponse([
+    $order->printResponse([
         'status' => false,
         'message' => 'Only POST method allowed'
     ]);
@@ -19,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 if (!isset($_GET['order_id']) || empty($_GET['order_id'])) {
     http_response_code(400);
-    $auth->printResponse([
+    $order->printResponse([
         'status' => false,
         'message' => 'Order ID is required'
     ]);
@@ -27,18 +25,19 @@ if (!isset($_GET['order_id']) || empty($_GET['order_id'])) {
 }
 
 $order = new Order();
+$order->updateStatus($_GET['order_id'], 'ordered');
 $order_id = $order->getById($_GET['order_id']);
 
 if (!$order_id) {
     http_response_code(404);
-    $auth->printResponse([
+    $order->printResponse([
         'status' => false,
         'message' => 'Order not found'
     ]);
     exit;
 }
 
-$auth->printResponse([
+$order->printResponse([
     'status' => true,
     'order' => $order_id
 ]);
