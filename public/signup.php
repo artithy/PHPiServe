@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/cors.php';
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -13,6 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
         'status' => false,
         'message' => 'Only POST method are allowed'
     ]);
+    exit();
 }
 
 $input = json_decode(file_get_contents('php://input'), true);
@@ -28,6 +30,7 @@ if (
         'status' => false,
         'message' => 'Please fill up all the fields'
     ]);
+    exit();
 }
 
 $response = $auth->signup($data['user_name'], $data['email'], $data['password']);
