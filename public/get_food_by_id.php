@@ -6,7 +6,7 @@ use App\classes\Food;
 
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     http_response_code(405);
-    $cuisine->printResponse([
+    $food->printResponse([
         'status' => false,
         'message' => 'Only GET method is allowed'
     ]);

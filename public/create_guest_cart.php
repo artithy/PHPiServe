@@ -1,5 +1,5 @@
 <?php
-
+require_once __DIR__ . '/cors.php';
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use App\classes\Cart;
@@ -15,9 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 $cart = new Cart();
-
 $cart->create_table();
-
 $token = $cart->createCart();
 
 if ($token) {

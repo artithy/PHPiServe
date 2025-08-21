@@ -7,7 +7,7 @@ use App\classes\Food;
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
-    $cuisine->printResponse([
+    $food->printResponse([
         'status' => false,
         'message' => 'Only POST method is allowed'
     ]);
