@@ -19,10 +19,13 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+
 $input = json_decode(file_get_contents('php://input'), true);
+error_log(print_r($input, true));
 
 
-if (!isset($_GET['cart_token']) || empty($_GET['cart_token'])) {
+$cart_token = $input['cart_token'] ?? null;
+if (!$cart_token) {
     http_response_code(400);
     $auth->printResponse([
         'status' => false,
@@ -33,7 +36,7 @@ if (!isset($_GET['cart_token']) || empty($_GET['cart_token'])) {
 
 
 $cart = new Cart();
-$cart = $cart->getCartByToken($_GET['cart_token']);
+$cart = $cart->getCartByToken($cart_token);
 
 if (!$cart) {
     http_response_code(404);
@@ -44,9 +47,18 @@ if (!$cart) {
     exit;
 }
 
+
+if (!isset($input['food_id'])) {
+    http_response_code(400);
+    $auth->printResponse([
+        'status' => false,
+        'message' => 'Food ID is required',
+    ]);
+    exit;
+}
+
 $cartItem = new CartItem();
 $deleted = $cartItem->delete($cart['id'], $input['food_id']);
-
 
 if ($deleted) {
     http_response_code(200);

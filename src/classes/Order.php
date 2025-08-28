@@ -48,19 +48,26 @@ class Order extends Database
 
     public function createOrder($cart_id, $customer_name, $customer_address, $customer_phone, $order_notes, $total_price, $order_id, $invoice_id = null)
     {
+        $invoice_id_quoted = $invoice_id === null ? 'NULL' : $this->pdo->quote($invoice_id);
+
         $sql = "INSERT INTO orders (
-        cart_id, customer_name, customer_address, customer_phone, order_notes, total_price, order_id, invoice_id, status
-    ) VALUES (
-        '{$cart_id}',
-        '{$customer_name}',
-        '{$customer_address}',
-        '{$customer_phone}',
-        '{$order_notes}',
-        '{$total_price}',
-        '{$order_id}',
-        '{$invoice_id}',
-        'pending'
-    )";
+    cart_id, customer_name, customer_address, customer_phone, order_notes, total_price, order_id, invoice_id, status
+) VALUES (
+    {$this->pdo->quote($cart_id)},
+    {$this->pdo->quote($customer_name)},
+    {$this->pdo->quote($customer_address)},
+    {$this->pdo->quote($customer_phone)},
+    {$this->pdo->quote($order_notes)},
+    {$this->pdo->quote($total_price)},
+    {$this->pdo->quote($order_id)},
+    $invoice_id_quoted,
+    'pending'
+)";
+        $this->pdo->exec($sql);
+        return $this->pdo->lastInsertId();
+
+
+
 
         $this->pdo->exec($sql);
         return $this->pdo->lastInsertId();

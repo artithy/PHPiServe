@@ -67,11 +67,9 @@ class CartItem extends Database
         food.discount_price,
         food.image
         FROM cart_items
-        LEFT JOIN 
-        food ON cart_items.food_id = food.id
-        WHERE cart_items.cart_id = '$cart_id'   
-        ";
-
+        LEFT JOIN food ON cart_items.food_id = food.id
+        WHERE cart_items.cart_id = '$cart_id'  
+        AND cart_items.quantity > 0";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute();
 
