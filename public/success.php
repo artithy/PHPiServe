@@ -2,43 +2,51 @@
 require_once __DIR__ . '/cors.php';
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use App\classes\Order;
-use App\traits\AuthUtils;
+$appKey    = "";
+$secretKey = "";
 
-$order = new Order();
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405);
-    $order->printResponse([
-        'status' => false,
-        'message' => 'Only POST method allowed'
+$orderId = $_GET['order_id'] ?? null;
+$invoiceId = $_GET['invoice'] ?? null;
+
+if (!$orderId || !$invoiceId) {
+    echo json_encode([
+        "status" => false,
+        "message" => "Invoice Id or Order Id not found"
     ]);
-    exit;
 }
 
-if (!isset($_GET['order_id']) || empty($_GET['order_id'])) {
-    http_response_code(400);
-    $order->printResponse([
-        'status' => false,
-        'message' => 'Order ID is required'
-    ]);
-    exit;
-}
+$bearerToken = "Bearer " . base64_encode($appKey . ":" . md5($secretKey . time()));
 
-$order = new Order();
-$order->updateStatus($_GET['order_id'], 'ordered');
-$order_id = $order->getById($_GET['order_id']);
-
-if (!$order_id) {
-    http_response_code(404);
-    $order->printResponse([
-        'status' => false,
-        'message' => 'Order not found'
-    ]);
-    exit;
-}
-
-$order->printResponse([
-    'status' => true,
-    'order' => $order_id
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_URL, "https://api-sandbox.portpos.com/payment/v2/invoice/$invoiceId");
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    "Authorization: $bearerToken",
+    "Content-Type: application/json"
 ]);
+$response = curl_exec($ch);
+curl_close($ch);
+
+$data = json_decode($response, true);
+
+$paymentStatus = $data['data']['order']['status'] ?? null;
+
+if ($paymentStatus === 'ACCEPTED') {
+    echo json_encode([
+        "status" => true,
+        "order_id" => $orderId,
+        "invoice_id" => $invoiceId,
+        "payment_status" => "SUCCESS",
+        "message" => "Payment Successful"
+    ]);
+} else {
+    echo json_encode([
+        "status" => false,
+        "order_id" => $orderId,
+        "invoice_id" => $invoiceId,
+        "payment_status" => "FAILED",
+        "message" => "Payment Failed",
+        "api_response" => $data
+    ]);
+}

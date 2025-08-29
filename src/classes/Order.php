@@ -93,21 +93,16 @@ class Order extends Database
 
     public function update($data, $id)
     {
-        $sql = "UPDATE orders SET 
-        cart_id = '{$data['cart_id']}',
-        customer_name = '{$data['customer_name']}',
-        customer_address = '{$data['customer_address']}',
-        customer_phone = '{$data['customer_phone']}',  
-        order_notes = '{$data['order_notes']}',
-        total_price = '{$data['total_price']}',
-        payment_status = '{$data['payment_status']}',
-        status = '{$data['status']}',
-        order_id = '{$data['order_id']}',   
-        invoice_id = '{$data['invoice_id']}'
-        WHERE id = $id";
+        $fields = [];
+        foreach ($data as $key => $value) {
+            $fields[] = "$key = " . ($value === null ? "NULL" : $this->pdo->quote($value));
+        }
+
+        $sql = "UPDATE orders SET " . implode(", ", $fields) . " WHERE id = $id";
 
         return $this->pdo->exec($sql);
     }
+
     public function updateStatus($id, $status)
     {
         $valid_statuses = ['pending', 'ordered', 'shipped', 'delivered', 'cancelled', 'returned'];
