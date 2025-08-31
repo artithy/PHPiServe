@@ -74,13 +74,25 @@ class Order extends Database
     }
 
 
-    public function getAll()
+    public function getAllOrdersWithItems()
     {
-        $sql = "SELECT* FROM orders ORDER BY order_date DESC";
 
-        return $this->pdo->query($sql)
-            ->fetchAll(PDO::FETCH_ASSOC);
+        $sql = "SELECT id, order_id, invoice_id, customer_name, customer_address, customer_phone, total_price, status, order_date
+            FROM orders
+            ORDER BY id DESC";
+        $orders = $this->pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+
+
+        foreach ($orders as &$order) {
+            $sqlItems = "SELECT food_id, food_name, quantity, price_at_order, image
+                     FROM order_items
+                     WHERE order_id = " . $order['id'];
+            $order['order_details'] = $this->pdo->query($sqlItems)->fetchAll(PDO::FETCH_ASSOC);
+        }
+
+        return $orders;
     }
+
 
 
     public function getById($id)

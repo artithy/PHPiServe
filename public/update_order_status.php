@@ -28,7 +28,7 @@ if (!isset($input['order_id'], $input['status'])) {
 }
 
 $order = new Order();
-$data = $order->updateStatus($input['order_id'], $input['status']);
+$data = $order->updateStatus(intval($input['order_id']), $input['status']);
 
 if ($data) {
     $order->printResponse([

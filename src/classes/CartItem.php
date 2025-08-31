@@ -65,6 +65,7 @@ class CartItem extends Database
         food.name,
         food.price,
         food.discount_price,
+        food.vat_price, 
         food.image
         FROM cart_items
         LEFT JOIN food ON cart_items.food_id = food.id
