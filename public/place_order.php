@@ -61,6 +61,7 @@ $orderItem->addItems($orderId, $input['items']);
 $appKey    = "";
 $secretKey = "";
 
+
 $postUrl = "https://api-sandbox.portpos.com/payment/v2/invoice";
 $bearerToken = "Bearer " . base64_encode($appKey . ":" . md5($secretKey . time()));
 

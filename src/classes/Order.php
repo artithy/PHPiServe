@@ -134,4 +134,79 @@ class Order extends Database
     //     $sql = "DELETE FROM orders WHERE id = $id";
     //     return $this->pdo->exec($sql);
     // }
+
+
+    public function countTodayOrders()
+    {
+        $stmt = $this->pdo->prepare("SELECT COUNT(*) as total FROM orders WHERE DATE(order_date) = CURDATE()");
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
+    }
+
+    public function countPendingDelivery()
+    {
+        $stmt = $this->pdo->prepare("SELECT COUNT(*) as total FROM orders WHERE status = 'pending'");
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+    }
+
+    public function sumTodayPayments()
+    {
+        $stmt = $this->pdo->prepare("SELECT SUM(total_price) as total FROM orders WHERE DATE(order_date) = CURDATE()");
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
+    }
+
+    public function countCompleteOrders()
+    {
+        $stmt = $this->pdo->prepare("SELECT COUNT(*) as total FROM orders WHERE status = 'delivered'");
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+    }
+
+    public function ordersByDays()
+    {
+        $stmt = $this->pdo->query("
+        SELECT DATE(order_date) as day, COUNT(*) as total from orders
+        WHERE order_date >= CURDATE() - INTERVAL 6 DAY
+        GROUP BY DATE(order_date);
+        ");
+
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $labels = [];
+        $data = [];
+        foreach ($result as $row) {
+            $labels[] = date('D', strtotime($row['day']));
+            $data[] = $row['total'];
+        }
+
+        return [
+            'labels' => $labels,
+            'data' => $data
+        ];
+    }
+
+    public function ordersByHour()
+    {
+        $stmt = $this->pdo->query("
+        SELECT HOUR(order_date) as hour, COUNT(*) as total from orders 
+        WHERE DATE(order_date) = CURDATE()
+        GROUP BY HOUR(order_date)
+        ");
+
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $labels = [];
+        $data = [];
+        foreach ($result as $row) {
+            $labels[] = $row['hour'] . ":00";
+            $data[] = intval($row['total']);
+        }
+
+        return [
+            'labels' => $labels,
+            'data' => $data
+        ];
+    }
 }

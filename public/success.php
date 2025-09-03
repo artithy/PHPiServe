@@ -1,10 +1,12 @@
 <?php
+
+use App\classes\Order;
+
 require_once __DIR__ . '/cors.php';
 require_once __DIR__ . '/../vendor/autoload.php';
 
 $appKey    = "";
 $secretKey = "";
-
 
 $orderId = $_GET['order_id'] ?? null;
 $invoiceId = $_GET['invoice'] ?? null;
@@ -32,7 +34,16 @@ $data = json_decode($response, true);
 
 $paymentStatus = $data['data']['order']['status'] ?? null;
 
-if ($paymentStatus === 'ACCEPTED') {
+$order = new Order();
+$orderData = $order->pdo->query("SELECT * FROM orders WHERE order_id = " . $order->pdo->quote($orderId))->fetch();
+
+if ($paymentStatus === 'ACCEPTED' && $orderData) {
+
+    $order->update([
+        "payment_status" => "paid",
+        "invoice_id" => $invoiceId,
+        "status" => "ordered"
+    ], $orderData['id']);
     echo json_encode([
         "status" => true,
         "order_id" => $orderId,

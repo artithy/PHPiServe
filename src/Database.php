@@ -24,6 +24,7 @@ class Database
             );
 
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $this->pdo->exec("SET time_zone = '+06:00'");
             return $this->pdo;
         } catch (PDOException $e) {
 
