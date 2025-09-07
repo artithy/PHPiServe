@@ -42,7 +42,16 @@ class Cuisine extends Database
 
     public function update($id, $name)
     {
-        return $this->pdo->exec("UPDATE cuisine SET name = '$name' WHERE id = $id");
+        $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM cuisine WHERE name = :name AND id != :id");
+        $stmt->execute([':name' => $name, ':id' => $id]);
+        $count = $stmt->fetchColumn();
+
+        if ($count > 0) {
+            return false;
+        }
+
+        $stmt = $this->pdo->prepare("UPDATE cuisine SET name = :name WHERE id = :id");
+        return $stmt->execute([':name' => $name, ':id' => $id]);
     }
 
     public function delete($id)
