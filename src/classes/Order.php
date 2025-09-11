@@ -63,6 +63,7 @@ class Order extends Database
     $invoice_id_quoted,
     'pending'
 )";
+
         $this->pdo->exec($sql);
         return $this->pdo->lastInsertId();
 
@@ -117,7 +118,7 @@ class Order extends Database
 
     public function updateStatus($id, $status)
     {
-        $valid_statuses = ['pending', 'ordered', 'shipped', 'delivered', 'cancelled', 'returned'];
+        $valid_statuses = ['pending', 'shipped', 'delivered', 'cancelled', 'returned'];
 
         if (!in_array($status, $valid_statuses)) {
             throw new \Exception("Invalid status: $status");
@@ -145,10 +146,11 @@ class Order extends Database
 
     public function countPendingDelivery()
     {
-        $stmt = $this->pdo->prepare("SELECT COUNT(*) as total FROM orders WHERE status = 'pending'");
+        $stmt = $this->pdo->prepare("SELECT COUNT(*) as total FROM orders WHERE status = 'pending' OR status = 'ordered'");
         $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC)['total'];
     }
+
 
     public function sumTodayPayments()
     {
